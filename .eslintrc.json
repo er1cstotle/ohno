@@ -1,0 +1,122 @@
+{
+	"env": {
+			"browser": true,
+			"node": true,
+			"es6": true
+	},
+	"extends": [
+			"eslint:recommended",
+			"plugin:react/recommended"
+	],
+	"globals": {
+			"Atomics": "readonly",
+			"SharedArrayBuffer": "readonly"
+	},
+	"parser": "babel-eslint",
+	"parserOptions": {
+			"ecmaFeatures": {
+					"jsx": true
+			},
+			"ecmaVersion": 2018,
+			"sourceType": "module"
+	},
+	"plugins": [
+			"react"
+	],
+	"rules": {
+			"array-bracket-spacing": [
+					"error",
+					"never"
+			],
+			"arrow-spacing": [
+					"error"
+			],
+			"block-spacing": [
+					"error",
+					"always"
+			],
+			"brace-style": [
+					"error",
+					"1tbs",
+					{
+							"allowSingleLine": true
+					}
+			],
+			"comma-dangle": [
+					"error",
+					"never"
+			],
+			"comma-spacing": [
+					"error",
+					{
+							"before": false,
+							"after": true
+					}
+			],
+			"comma-style": [
+					"error",
+					"last"
+			],
+			"curly": [
+					"error"
+			],
+			"eqeqeq": [
+					"error"
+			],
+			"indent": [
+					"error",
+					2
+			],
+			"linebreak-style": [
+					"error",
+					"unix"
+			],
+			"no-multi-spaces": [
+					"error"
+			],
+			"no-multiple-empty-lines": [
+					"error"
+			],
+			"no-trailing-spaces": [
+					"error"
+			],
+			"object-curly-spacing": [
+					"error",
+					"always"
+			],
+			"prefer-template": [
+					"error"
+			],
+			"quotes": [
+					"error",
+					"single"
+			],
+			"react/prop-types": [
+				0
+			],
+			"react/display-name": [0, { "ignoreTranspilerName": true }],
+			"semi": [
+					"error",
+					"always",
+					{
+							"omitLastInOneLineBlock": true
+					}
+			],
+			"space-before-blocks": [
+					"error",
+					"always"
+			],
+			"space-before-function-paren": [
+					"error",
+					{
+							"anonymous": "never",
+							"named": "never",
+							"asyncArrow": "always"
+					}
+			],
+			"space-in-parens": [
+					"error",
+					"never"
+			]
+	}
+}

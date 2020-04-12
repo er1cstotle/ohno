@@ -9,7 +9,6 @@ const Item = styled(React.forwardRef(({ isDragging, ...props }, ref) => <Paper {
   backgroundColor: props.isDragging ? 'blue' : 'white'
 }));
 
-
 export default (props) => {
   return (
     <Draggable draggableId={props.item.id} index={props.index}>

@@ -1,8 +1,9 @@
 import React from 'react';
 import {
   BrowserRouter,
-  Switch,
+  Redirect,
   Route,
+  Switch,
   withRouter
 } from 'react-router-dom';
 
@@ -48,6 +49,8 @@ const SwitchWithTransition = withRouter(({ children, location }) => {
 
 const Router = () => {
   const [user, loading, error] = useAuthState(auth);
+  console.log('after the hook has fired');
+
 
   if (loading) {
     return <p>Loading the whole app</p>;
@@ -70,7 +73,14 @@ const Router = () => {
               key={route.path}
               path={route.path}
               render={props => (
-                <route.page {...props} user={user} />
+                route.private && !user ?
+                  <Redirect
+                    key={route.path}
+                    to={{
+                      pathname: '/login'
+                    }}
+                  /> :
+                  <route.page {...props} user={user} />
               )}
             />;
           })}

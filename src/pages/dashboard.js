@@ -1,33 +1,37 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
-import { makeStyles } from '@material-ui/core/styles';
+import { styled } from '@material-ui/core/styles';
 
 import { retroPath } from 'routes';
 
 import retroService from 'services/retros';
 
 import AddIcon from '@material-ui/icons/Add';
-import { Container, Fab, Grid, Slide } from '@material-ui/core';
+import { Container, Fab, Grid, Slide, Hidden } from '@material-ui/core';
 import { Seo, Link } from 'components';
 
-const useStyles = makeStyles(theme => ({
-  addButton: {
-    position: 'fixed',
-    bottom: 48,
-    right: 48
-  }
-}));
+const AddBtn = styled(Fab)({
+  position: 'fixed',
+  bottom: 48,
+  right: 48
+});
 
 const Dashboard = ({ user }) => {
-  const classes = useStyles();
   const history = useHistory();
+  const [retros, setRetros] = useState({});
+
+  useEffect(() => {
+    const getData = async () => {
+      const retros = await retroService.all(user.uid);
+      setRetros(retros);
+    };
+
+    getData();
+  }, []);
 
   const createRetro = async () => {
     try {
-      const userID = user ? user.uid : undefined;
-      const retro = await retroService.create(userID);
-      console.log(retro);
-
+      const retro = await retroService.create(user.uid);
       history.push(retroPath(retro.id));
     } catch (error) {
       console.log(error);
@@ -39,24 +43,24 @@ const Dashboard = ({ user }) => {
       <Seo title={'Dashboard'}/>
 
       <Grid container>
-        <Grid item xs={3}>
-          hi
+        <Grid item xs={12} sm={9}>
+          {Object.values(retros).map((retro) => (
+            <Link key={retro.id} to={retroPath(retro.id)}>
+              {retro.id}
+            </Link>
+          ))}
         </Grid>
-        <Grid item xs={3}>
-          hi
-        </Grid>
-        <Grid item xs={3}>
-          hi
-        </Grid>
-        <Grid item xs={3}>
-          hi
-        </Grid>
+        <Hidden xsDown>
+          <Grid item sm={3}>
+            hi
+          </Grid>
+        </Hidden>
       </Grid>
 
       <Slide direction="up" timeout={800} in mountOnEnter unmountOnExit>
-        <Fab className={classes.addButton} color="primary" aria-label="add" onClick={createRetro}>
+        <AddBtn color="primary" aria-label="add" onClick={createRetro}>
           <AddIcon />
-        </Fab>
+        </AddBtn>
       </Slide>
 
     </Container>

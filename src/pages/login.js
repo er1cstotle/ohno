@@ -24,7 +24,6 @@ const Login = ({ user }) => {
     } catch (error) {
       console.log(error);
     }
-
   };
 
   return (
@@ -40,7 +39,6 @@ const Login = ({ user }) => {
           </Slide>
         </Grid>
       </Grid>
-
 
     </Container>
   );

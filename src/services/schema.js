@@ -1,8 +1,9 @@
 import firebase, { firestore } from '../services/firebase';
 
-export const retrosRef = firestore.collection('retros');
-export const usersRef = firestore.collection('users');
-export const columnsRef = firestore.collection('columns');
+export const retrosCollection = firestore.collection('retros');
+export const usersCollection = firestore.collection('users');
+export const columnsCollection = firestore.collection('columns');
+export const cardsCollection = firestore.collection('cards');
 
 export const Retro = ({ userID = '' }) => {
   return {
@@ -19,6 +20,18 @@ export const Column = ({ title = '', retroID, userID }) => {
     title,
     retroID,
     userID,
+    cardIDs: [],
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+};
+
+export const Card = ({ title = '', content = '', retroID, userID, ColumnID }) => {
+  return {
+    title,
+    content,
+    retroID,
+    userID,
+    ColumnID,
     cardIDs: [],
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   };

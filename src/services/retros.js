@@ -1,15 +1,16 @@
 import { useState, useEffect } from 'react';
-import { retrosRef, Retro, columnsRef, Column } from './schema';
+import { retrosCollection, Retro, cardsCollection, Card, columnsCollection, Column } from './schema';
 import useActions from 'hooks/useActions';
+import { useCollectionData, useDocumentData } from 'lib/fire-hydrant';
 
 export default {
   create: (userID) => {
     const newRetro = Retro({ userID });
-    return retrosRef.add(newRetro);
+    return retrosCollection.add(newRetro);
   },
   all: async (userID) => {
     try {
-      const retrosSnapshop = await retrosRef.where('members', 'array-contains', userID).get();
+      const retrosSnapshop = await retrosCollection.where('members', 'array-contains', userID).get();
 
       if (retrosSnapshop.empty) {
         return {};
@@ -29,7 +30,7 @@ export default {
   },
   find: async (retroID) => {
     try {
-      const snapshot = await retrosRef.doc(retroID).get();
+      const snapshot = await retrosCollection.doc(retroID).get();
 
       return {
         id: snapshot.id,
@@ -39,97 +40,52 @@ export default {
       console.log(error);
     }
   },
-  updateColumnOrder: async (retroID, columnOrder) => {
-    return retrosRef.doc(retroID).update({
-      columnOrder
-    });
-  },
   useRetro: (retroID) => {
-    const [retro, setRetro] = useState();
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState();
-
-    const update = (retro) => {
-      console.log('set the new order');
-
-      setRetro(retro);
-      return retrosRef.doc(retroID).update(retro);
-    };
-
-    useEffect(() => {
-      const unsubscribe = retrosRef.doc(retroID).onSnapshot(
-        (snapshot) => {
-          const retro = {
-            id: snapshot.id,
-            ...snapshot.data()
-          };
-
-          if (!loading) {
-            setLoading(false);
-          }
-
-          setRetro(retro);
-        },
-        (error) => {
-          console.log(error);
-          setError(error);
-        });
-
-      return unsubscribe;
-    }, []);
-
-
-    return [retro, error, update];
+    return useDocumentData(retrosCollection.doc(retroID), {
+      updateRetro: (state, retro) => {
+        retrosCollection.doc(retroID).update(retro);
+        return retro;
+      }
+    });
   },
   addColumn: ({ userID, retroID }) => {
     const newColumn = Column({ userID, retroID });
-    return columnsRef.add(newColumn);
+    return columnsCollection.add(newColumn);
   },
   useColumns: (documentID) => {
-    const [documents, setDocuments] = useState();
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState();
+    return useCollectionData(columnsCollection.where('retroID', '==', documentID), {
+      addColumn: (state, { userID, retroID, title }) => {
+        const newColumn = Column({ title, userID, retroID });
+        const newDoc = columnsCollection.doc();
 
+        newDoc.set(newColumn);
 
-    const add = ({ userID, retroID }) => {
-      const newColumn = Column({ userID, retroID });
-      const newDoc = columnsRef.doc();
+        return [
+          ...state,
+          {
+            ...newColumn,
+            id: newDoc.id
+          }
+        ];
+      }
+    });
+  },
+  useCards: (documentID) => {
+    return useCollectionData(cardsCollection.where('retroID', '==', documentID), {
+      addCard: (state, { userID, retroID, title }) => {
+        const newCard = Card({ title, userID, retroID });
+        const newDoc = cardsCollection.doc();
 
-      newDoc.set(newColumn);
+        newDoc.set(newCard);
 
-      setDocuments([
-        ...documents,
-        {
-          ...newColumn,
-          id: newDoc.id
-        }
-      ]);
-
-      return newDoc;
-    };
-
-    useEffect(() => {
-      const unsubscribe = columnsRef.where('retroID', '==', documentID).onSnapshot(
-        (snapshot) => {
-          const docs = snapshot.docs.map((doc) => {
-            return {
-              id: doc.id,
-              ...doc.data()
-            };
-          });
-
-          setDocuments(docs);
-        },
-        (error) => {
-          console.log(error);
-          setError(error);
-        });
-
-      return unsubscribe;
-    }, []);
-
-
-    return [documents, error, add];
-
+        return [
+          ...state,
+          {
+            ...newCard,
+            id: newDoc.id
+          }
+        ];
+      }
+    });
   }
 };

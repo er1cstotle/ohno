@@ -88,120 +88,48 @@ admin.initializeApp({
 const firestore = admin.firestore();
 
 const usersCollection = firestore.collection('users');
-const projectsCollection = firestore.collection('projects');
-const filesCollection = firestore.collection('files');
+const retrosCollection = firestore.collection('retros');
+const columnsCollection = firestore.collection('columns');
+const cardsCollection = firestore.collection('cards');
 
 const seedFunction = async () => {
-  const ericUserID = 'tPkrVIi04NdKyoSrWEV95tCR9MK2';
+  const userID = 'sldnfsd99h';
 
-  const userRef = usersCollection.doc(ericUserID);
-
-  userRef.set({
-    username: 'ericstotle'
+  const newRetro = await retrosCollection.add({
+    title: 'Demo Board',
+    creatorID: userID,
+    members: [userID],
+    columnOrder: [],
+    createdAt: admin.firestore.FieldValue.serverTimestamp()
   });
 
-  // for Personal
-  const personalOrganizationDoc = await projectsCollection.add({
-    name: 'Personal',
-    creator: userRef,
-    admins: [usersCollection.doc(ericUserID)],
-    members: [usersCollection.doc(ericUserID)],
-    labels: ['Blueprints', 'Diagrams', 'Random', 'Demo']
-  });
 
-  [1, 2, 3, 4, 5].forEach(async (number) => {
-    const fileDoc = await filesCollection.add({
-      projectRef: personalOrganizationDoc,
-      userID: 'P8VSjFSeduaoP3ELW3V6UuA9erR2',
-      title: `Personal File ${number}`,
-      content: sampleMarkdown,
-      approvals: {},
-      labels: ['Blueprints', 'Diagrams', 'Random', 'Demo'],
+  const columns = await Promise.all([1, 2, 3].map(async (num) => {
+    const newCol = await columnsCollection.add({
+      title: `column ${num}`,
+      retroID: newRetro.id,
+      userID,
+      cardIDs: [],
       createdAt: admin.firestore.FieldValue.serverTimestamp()
     });
 
-    [1, 2].forEach(async () => {
-      const activityDoc = await fileDoc.collection('activities').add({
-        type: 'APPROVAL',
-        userRef: userRef,
-        fileRef:fileDoc,
-        username: 'Eric Leong',
-        avatarURL: 'https://avatars1.githubusercontent.com/u/8476121?v=4',
-        createdAt: admin.firestore.FieldValue.serverTimestamp()
+    const cards = await Promise.all([1, 2].map((int) => {
+      return cardsCollection.add({
+        retroID: newRetro.id,
+        content: `content ${int}`,
+        columnID: newCol.id
       });
+    }));
 
+    newCol.update({
+      cardIDs: cards.map((card) => card.id)
     });
 
-    [1, 2, 3, 4, 5].forEach(async () => {
-      const commentRef = await fileDoc.collection('comments').add({
-        body: 'some toxic feedback about this scumbags blueprint',
-        fileRef: fileDoc,
-        authorID: 'P8VSjFSeduaoP3ELW3V6UuA9erR2',
-        avatarURL: 'https://avatars1.githubusercontent.com/u/8476121?v=4',
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        resolved: false,
-        position: null
-      });
+    return newCol;
+  }));
 
-      [1, 2].forEach(async () => {
-        await commentRef.collection('replies').add({
-          body: 'This is the best way I think.',
-          fileRef: fileDoc,
-          commentRef: commentRef,
-          authorID: 'P8VSjFSeduaoP3ELW3V6UuA9erR2',
-          avatarURL: 'https://avatars1.githubusercontent.com/u/8476121?v=4',
-          createdAt: admin.firestore.FieldValue.serverTimestamp()
-        });
-      });
-
-    });
-  });
-
-
-  // FOR ORG
-  const ojOrganizationDoc = await projectsCollection.add({
-    name: 'Orange Juice',
-    creator: userRef,
-    admins: [usersCollection.doc(ericUserID)],
-    members: [usersCollection.doc(ericUserID)],
-    labels: ['Juice']
-  });
-
-
-  [1, 2, 3, 4, 5].forEach(async (number) => {
-    const fileDoc = await filesCollection.add({
-      projectRef: ojOrganizationDoc,
-      userID: 'P8VSjFSeduaoP3ELW3V6UuA9erR2',
-      title: `OJ File ${number}`,
-      content: sampleMarkdown,
-      approvals: {},
-      labels: ['Juice'],
-      createdAt: admin.firestore.FieldValue.serverTimestamp()
-    });
-
-    [1, 2, 3, 4, 5].forEach(async () => {
-      const commentRef = await fileDoc.collection('comments').add({
-        body: 'some toxic feedback about this scumbags blueprint',
-        fileRef: fileDoc,
-        authorID: 'P8VSjFSeduaoP3ELW3V6UuA9erR2',
-        avatarURL: 'https://avatars1.githubusercontent.com/u/8476121?v=4',
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        resolved: false,
-        position: null
-      });
-
-      [1, 2].forEach(async () => {
-        await commentRef.collection('replies').add({
-          body: 'This is the best way I think.',
-          fileRef: fileDoc,
-          commentRef: commentRef,
-          authorID: 'P8VSjFSeduaoP3ELW3V6UuA9erR2',
-          avatarURL: 'https://avatars1.githubusercontent.com/u/8476121?v=4',
-          createdAt: admin.firestore.FieldValue.serverTimestamp()
-        });
-      });
-
-    });
+  newRetro.update({
+    columnOrder: columns.map((column) => column.id)
   });
 
 };

@@ -49,8 +49,6 @@ const SwitchWithTransition = withRouter(({ children, location }) => {
 
 const Router = () => {
   const [user, loading, error] = useAuthState(auth);
-  console.log('after the hook has fired');
-
 
   if (loading) {
     return <p>Loading the whole app</p>;

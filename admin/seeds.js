@@ -116,6 +116,7 @@ const seedFunction = async () => {
     const cards = await Promise.all([1, 2].map((int) => {
       return cardsCollection.add({
         retroID: newRetro.id,
+        title: `title ${int}`,
         content: `content ${int}`,
         columnID: newCol.id
       });

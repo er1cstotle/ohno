@@ -5,9 +5,10 @@ const useActions = (actions, initial) => {
   const wired = {};
 
   for (const action in actions) {
-    wired[action] = async (...params) =>
-      setState(await actions[action](state, ...params));
+    wired[action] = (...params) =>
+      setState((prev) => actions[action](prev, ...params));
   }
+
   return [state, wired];
 };
 

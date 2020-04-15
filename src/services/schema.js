@@ -25,14 +25,13 @@ export const Column = ({ title = '', retroID, userID }) => {
   };
 };
 
-export const Card = ({ title = '', content = '', retroID, userID, ColumnID }) => {
+export const Card = ({ title = '', content = '', retroID, userID, columnID }) => {
   return {
     title,
     content,
     retroID,
     userID,
-    ColumnID,
-    cardIDs: [],
+    columnID,
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   };
 };

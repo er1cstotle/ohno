@@ -1,79 +1,44 @@
-import React, { useState, useEffect, Component } from 'react';
-import keyBy from 'lodash/keyBy';
-import difference from 'lodash/difference';
-import head from 'lodash/head';
+import React from 'react';
 
 import retroService from 'services/retros';
+import { useBoardData } from 'services/board';
 
 import { Container, Fab, Grid, Slide } from '@material-ui/core';
 import { Seo, Link } from 'components';
 import Board from 'react-trello';
 
-const formatBoardData = (retro, lanes, cards) => {
-  if (!(retro && lanes && cards)) {
-    return;
-  }
-
-  const columnsMap = keyBy(lanes, 'id');
-  const cardsMap = keyBy(cards, 'id');
-
-  const formattedLanes = retro.columnOrder.map((columnID) => {
-    const lane = columnsMap[columnID];
-
-    const cards = lane.cardIDs.map((cardID) => {
-      return cardsMap[cardID];
-    });
-
-    lane.cards = cards;
-    return lane;
-  });
-
-  return {
-    lanes: formattedLanes
-  };
-};
-
 const RetroShow = ({ user, match }) => {
   const retroID = match.params.retroID;
 
   const [retro, error, { updateRetro }] = retroService.useRetro(retroID);
-  const [columns, colError, { addColumn }] = retroService.useColumns(retroID);
-  const [cards, cardError, { addCard }] = retroService.useCards(retroID);
+  const columnOrder = retro && retro.columnOrder;
+  const [boardState, loadingBoard, { addColumn, addCard, moveCard }] = useBoardData(retroID, columnOrder);
 
-  useEffect(() => {
-    if (columns && retro && retro.columnOrder.length < columns.length) {
-      const allIDs = columns.map(({ id }) => id);
-      const newID = head(difference(allIDs, retro.columnOrder));
+  console.log(boardState);
 
-      const newColumnOrder = [...retro.columnOrder, newID];
-
-      const newRetro = {
-        ...retro,
-        columnOrder: newColumnOrder
-      };
-
-      updateRetro(newRetro);
-    }
-  }, [retro, columns]);
-
-  const boardData = formatBoardData(retro, columns, cards);
-
-  const onAddLane = ({ title }) => {
-    addColumn({
+  const onAddLane = async ({ title }) => {
+    const newCol = addColumn({
       userID: user.uid,
       retroID,
       title
     });
+
+    const newColumnOrder = [...retro.columnOrder, newCol.id];
+
+    const newRetro = {
+      ...retro,
+      columnOrder: newColumnOrder
+    };
+
+    updateRetro(newRetro);
   };
 
-  const onAddCard = (props) => {
-    console.log(props);
-
-    // addCard({
-    //   userID: user.uid,
-    //   retroID,
-    //   title
-    // });
+  const onAddCard = ({ title }, laneID) => {
+    addCard({
+      userID: user.uid,
+      title,
+      laneID
+    });
   };
 
   const onLaneDrop = (sourceIndex, destIndex, payload) => {
@@ -86,65 +51,16 @@ const RetroShow = ({ user, match }) => {
       columnOrder: newColumnOrder
     };
 
-    return updateRetro(newRetro);
+    updateRetro(newRetro);
   };
 
 
-  // const onItemDrop = (draggableID, source, destination) => {
-  //   const startColumn = state.columns[source.droppableId];
-  //   const endColumn = state.columns[destination.droppableId];
-
-  //   // moving in the same list
-  //   if (startColumn === endColumn) {
-  //     const newTaskIDs = [...startColumn.taskIDs];
-
-  //     newTaskIDs.splice(source.index, 1);
-  //     newTaskIDs.splice(destination.index, 0, draggableID);
-
-  //     const newColumn = {
-  //       ...startColumn,
-  //       taskIDs: newTaskIDs
-  //     };
-
-  //     const newState = {
-  //       ...state,
-  //       columns: {
-  //         ...state.columns,
-  //         [newColumn.id]: newColumn
-  //       }
-  //     };
-
-  //     return setState(newState);
-  //   }
-
-  //   // moving between columns
-  //   const newStartTasks = [...startColumn.taskIDs];
-  //   newStartTasks.splice(source.index, 1);
-  //   const newStartColumn = {
-  //     ...startColumn,
-  //     taskIDs: newStartTasks
-  //   };
-
-  //   const newEndTasks = [...endColumn.taskIDs];
-  //   newEndTasks.splice(destination.index, 0, draggableID);
-  //   const newEndColumn = {
-  //     ...endColumn,
-  //     taskIDs: newEndTasks
-  //   };
-
-  //   const columns = {
-  //     ...state.columns,
-  //     [newStartColumn.id]: newStartColumn,
-  //     [newEndColumn.id]: newEndColumn
-  //   };
-
-  //   const newState = {
-  //     ...state,
-  //     columns
-  //   };
-
-  //   setState(newState);
-  // };
+  const onCardDrop = (cardId, sourceLaneId, targetLaneId, position, cardDetails) => {
+    moveCard(cardId, sourceLaneId, targetLaneId, position);
+    // annoying hack to get this package to work. returning false simulates a cancelled drop. We then manually update the state
+    // could also wrap the above call in a setTimeout
+    return false;
+  };
 
   // if (!retro || !columns) {
   //   return <p>loading</p>;
@@ -154,15 +70,15 @@ const RetroShow = ({ user, match }) => {
     <div>
       <Seo title={'Retro'}/>
 
-      {boardData && <Board
-        data={boardData}
+      {!loadingBoard && <Board
+        data={boardState}
         draggable
         editable
         canAddLanes
         handleLaneDragEnd={onLaneDrop}
+        handleDragEnd={onCardDrop}
         onLaneAdd={onAddLane}
         onCardAdd={onAddCard}
-        // onDataChange={(data) => console.log(data)}
       />}
 
     </div>

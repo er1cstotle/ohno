@@ -40,6 +40,11 @@ export default {
       console.log(error);
     }
   },
+  updateColumnOrder: (retroID, columnOrder) => {
+    return retrosCollection.doc(retroID).update({
+      columnOrder
+    });
+  },
   useRetro: (retroID) => {
     return useDocumentData(retrosCollection.doc(retroID), {
       updateRetro: (state, retro) => {
@@ -48,9 +53,13 @@ export default {
       }
     });
   },
-  addColumn: ({ userID, retroID }) => {
-    const newColumn = Column({ userID, retroID });
-    return columnsCollection.add(newColumn);
+  addColumn: ({ title, userID, retroID }) => {
+    const newColumn = Column({ title, userID, retroID });
+
+    const newDoc = columnsCollection.doc();
+    newDoc.set(newColumn);
+
+    return newDoc;
   },
   useColumns: (documentID) => {
     return useCollectionData(columnsCollection.where('retroID', '==', documentID), {

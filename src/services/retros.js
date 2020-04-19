@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { retrosCollection, Retro, cardsCollection, Card, columnsCollection, Column } from './schema';
-import useActions from 'hooks/useActions';
 import { useCollectionData, useDocumentData } from 'lib/fire-hydrant';
 
 export default {

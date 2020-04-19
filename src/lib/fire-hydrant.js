@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import useActions from 'hooks/useActions';
+import useActions from 'use-actions';
 
 export const docSnapshotToData = (snapshot) => {
   return {

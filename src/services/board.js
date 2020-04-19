@@ -1,6 +1,7 @@
 import { useState } from 'react';
+import useActions from 'use-actions';
+import firebase, { firestore } from './firebase';
 import { cardsCollection, Card, columnsCollection, Column } from './schema';
-import useActions from 'hooks/useActions';
 import { useCollectionDataListener } from 'lib/fire-hydrant';
 import keyBy from 'lodash/keyBy';
 
@@ -29,71 +30,26 @@ const formatBoardData = (columnOrder, columnsMap, cardsMap) => {
   };
 };
 
-export const useBoardData = (retroID, columnOrder) => {
-  const [loadingColumns, setLoadingColumns] = useState(true);
-  const [loadingCards, setLoadingCards] = useState(true);
-
-  const [boardState, setBoardState] = useState({
-    columns: {},
-    cards: {}
-  });
-
-  useCollectionDataListener(columnsCollection.where('retroID', '==', retroID), (columns) => {
-    setBoardState((prev) => ({
+const actions = {
+  setLanes: (prev, lanes) => {
+    return {
       ...prev,
-      columns: keyBy(columns, 'id')
-    }));
-    if (loadingColumns) {
-      setLoadingColumns(false);
-    }
-  });
-
-  useCollectionDataListener(cardsCollection.where('retroID', '==', retroID), (cards) => {
-    setBoardState((prev) => ({
+      columns: lanes
+    };
+  },
+  setCards: (prev, cards) => {
+    return {
       ...prev,
-      cards: keyBy(cards, 'id')
-    }));
-    if (loadingCards) {
-      setLoadingCards(false);
-    }
-  });
-
-  const isLoading = () => {
-    return loadingCards || loadingColumns;
-  };
-
-  const boardData = columnOrder && formatBoardData(columnOrder, boardState.columns, boardState.cards);
-
-  const addColumn = ({ title, userID }) => {
-    const newColumn = Column({ title, userID, retroID });
-
-    const newDoc = columnsCollection.doc();
-    newDoc.set(newColumn);
-
-    setBoardState((prev) => ({
-      ...prev,
-      columns: {
-        ...prev.columns,
-        [newDoc.id]: {
-          id: newDoc.id,
-          ...newColumn
-        }
-      }
-    }));
-
-    return newDoc;
-  };
-
-  const addCard = ({ title, userID, laneID }) => {
-    const newCard = Card({ title, retroID, userID, columnID: laneID });
-    const newDoc = cardsCollection.doc();
-
+      cards
+    };
+  },
+  addCard: (prev, laneID, newCard) => {
     const newCardIDs = [
-      ...boardState.columns[laneID].cardIDs,
-      newDoc.id
+      ...prev.columns[laneID].cardIDs,
+      newCard.id
     ];
 
-    setBoardState((prev) => ({
+    return {
       ...prev,
       columns: {
         ...prev.columns,
@@ -104,17 +60,108 @@ export const useBoardData = (retroID, columnOrder) => {
       },
       cards: {
         ...prev.cards,
-        [newDoc.id]: {
-          id:newDoc.id,
-          ...newCard
+        [newCard.id]: newCard
+      }
+    };
+  },
+  addLane: (prev, newLane) => {
+    return {
+      ...prev,
+      columns: {
+        ...prev.columns,
+        [newLane.id]: newLane
+      }
+    };
+  },
+  moveCardInLane: (prev, laneID, newCardIDs) => {
+
+
+    return {
+      ...prev,
+      columns: {
+        ...prev.columns,
+        [laneID]: {
+          ...prev.columns[laneID],
+          cardIDs: newCardIDs
         }
       }
-    }));
+    };
+  },
+  moveCardAcrossLanes: (prev, sourceLaneId, newSourceLaneCardIDs, targetLaneId, newTargetLaneCardIDs) => {
+    return {
+      ...prev,
+      columns: {
+        ...prev.columns,
+        [sourceLaneId]: {
+          ...prev.columns[sourceLaneId],
+          cardIDs: newSourceLaneCardIDs
+        },
+        [targetLaneId]: {
+          ...prev.columns[targetLaneId],
+          cardIDs: newTargetLaneCardIDs
+        }
+      }
+    };
+
+  }
+};
+
+export const useBoardData = (retroID, columnOrder) => {
+  const [loadingColumns, setLoadingColumns] = useState(true);
+  const [loadingCards, setLoadingCards] = useState(true);
+
+  const [boardState, boundActions] = useActions(actions, {
+    columns: {},
+    cards: {}
+  });
+
+  useCollectionDataListener(columnsCollection.where('retroID', '==', retroID), (columns) => {
+    boundActions.setLanes(keyBy(columns, 'id'));
+    if (loadingColumns) {
+      setLoadingColumns(false);
+    }
+  });
+
+  useCollectionDataListener(cardsCollection.where('retroID', '==', retroID), (cards) => {
+    boundActions.setCards(keyBy(cards, 'id'));
+    if (loadingCards) {
+      setLoadingCards(false);
+    }
+  });
+
+  const boardData = columnOrder && formatBoardData(columnOrder, boardState.columns, boardState.cards);
+
+  const isLoading = () => {
+    return loadingCards || loadingColumns;
+  };
+
+  const addColumn = ({ title, userID }) => {
+    const newColumn = Column({ title, userID, retroID });
+
+    const newDoc = columnsCollection.doc();
+    newDoc.set(newColumn);
+
+    boundActions.addLane({
+      id: newDoc.id,
+      ...newColumn
+    });
+
+    return newDoc;
+  };
+
+  const addCard = ({ title, userID, laneID }) => {
+    const newCard = Card({ title, retroID, userID, columnID: laneID });
+    const newDoc = cardsCollection.doc();
+
+    boundActions.addCard(laneID, {
+      id:newDoc.id,
+      ...newCard
+    });
 
     newDoc.set(newCard);
 
     columnsCollection.doc(laneID).update({
-      cardIDs: newCardIDs
+      cardIDs: firebase.firestore.FieldValue.arrayUnion(newDoc.id)
     });
   };
 
@@ -129,17 +176,9 @@ export const useBoardData = (retroID, columnOrder) => {
       }
 
       const newCardIDs = lane.cardIDs.filter((cardID) => cardID !== cardId);
+      newCardIDs.splice(position, 0, cardId);
 
-      lane.cardIDs = newCardIDs;
-      lane.cardIDs.splice(position, 0, cardId);
-
-      setBoardState((prev) => ({
-        ...prev,
-        columns: {
-          ...prev.columns,
-          [sourceLaneId]: lane
-        }
-      }));
+      boundActions.moveCardInLane(sourceLaneId, newCardIDs);
 
       columnsCollection.doc(sourceLaneId).update({
         cardIDs: newCardIDs
@@ -156,27 +195,10 @@ export const useBoardData = (retroID, columnOrder) => {
     const newTargetLaneCardIDs = [...targetLane.cardIDs];
     newTargetLaneCardIDs.splice(position, 0, cardId);
 
-    const newSourceLane = {
-      ...sourceLane,
-      cardIDs: newSourceLaneCardIDs
-    };
-
-    const newTargetLane = {
-      ...targetLane,
-      cardIDs: newTargetLaneCardIDs
-    };
-
-    setBoardState({
-      ...boardState,
-      columns: {
-        ...boardState.columns,
-        [sourceLaneId]: newSourceLane,
-        [targetLaneId]: newTargetLane
-      }
-    });
+    boundActions.moveCardAcrossLanes(sourceLaneId, newSourceLaneCardIDs, targetLaneId, newTargetLaneCardIDs);
 
     columnsCollection.doc(sourceLaneId).update({
-      cardIDs: newSourceLaneCardIDs
+      cardIDs: firebase.firestore.FieldValue.arrayRemove(cardId)
     });
 
     columnsCollection.doc(targetLaneId).update({

@@ -1,19 +1,16 @@
 import React from 'react';
+import { auth } from 'services/firebase';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 
 import theme from './theme';
 
 import {
   BrowserRouter
 } from 'react-router-dom';
-
+import { CssBaseline } from '@material-ui/core';
 import Authenticated from './routers/authenticated';
 import UnAuthenticated from './routers/unauthenticated';
-
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from 'services/firebase';
-
-import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
-import { CssBaseline } from '@material-ui/core';
 
 const muiTheme = createMuiTheme(theme);
 

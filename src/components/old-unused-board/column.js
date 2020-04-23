@@ -19,7 +19,7 @@ const Wrapper = styled(Grid)(({ theme }) => ({
 
 export default (props) => {
   return (
-    <Draggable draggableId={props.column.id} index={props.index}>
+    <Draggable draggableId={props.lane.id} index={props.index}>
       {(dragprovided) => (
         <Wrapper
           item
@@ -27,10 +27,10 @@ export default (props) => {
           ref={dragprovided.innerRef}
         >
           <Typography variant={'h4'} {...dragprovided.dragHandleProps}>
-            {props.column.title}
+            {props.lane.title}
           </Typography>
 
-          <Droppable droppableId={props.column.id} type={'task'}>
+          <Droppable droppableId={props.lane.id} type={'task'}>
             {(provided, snapshot) => {
               return (
                 <ItemList

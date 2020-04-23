@@ -4,14 +4,14 @@ import '@firebase/auth';
 
 try {
   var config = {
-    apiKey: 'AIzaSyCyoTTfJ0qphIaI4KC8NCHuQWQJNKHmp7Q',
-    authDomain: 'retros-dev-20eb6.firebaseapp.com',
-    databaseURL: 'https://retros-dev-20eb6.firebaseio.com',
-    projectId: 'retros-dev-20eb6',
-    storageBucket: 'retros-dev-20eb6.appspot.com',
-    messagingSenderId: '839749747017',
-    appId: '1:839749747017:web:40ae6709312d4bad90da98',
-    measurementId: 'G-NLM9575RPD'
+    apiKey: 'AIzaSyBD-r4kfR3kK0AiBpAFEw-3xoOzbDayCec',
+    authDomain: 'supra-turbo-dev.firebaseapp.com',
+    databaseURL: 'https://supra-turbo-dev.firebaseio.com',
+    projectId: 'supra-turbo-dev',
+    storageBucket: 'supra-turbo-dev.appspot.com',
+    messagingSenderId: '1057679064055',
+    appId: '1:1057679064055:web:0ff601eb6248b7a1504cf2',
+    measurementId: 'G-6LVDY0XMP4'
   };
   firebase.initializeApp(config);
 } catch (err) {

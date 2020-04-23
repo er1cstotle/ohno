@@ -3,7 +3,7 @@ import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import { styled } from '@material-ui/core/styles';
 
 import { Button, Grid } from '@material-ui/core';
-import Column from './column';
+import Lane from './lane';
 
 const Wrapper = styled(Grid)(({ theme }) => ({
   width: '100%',
@@ -12,7 +12,7 @@ const Wrapper = styled(Grid)(({ theme }) => ({
   }
 }));
 
-const Board = ({ columns, columnOrder, data, onColumnDrop, onItemDrop, onAddColumn, onAddItem }) => {
+const Board = ({ lanes, laneOrder, data, onLaneDrop, onItemDrop, onAddLane, onAddItem }) => {
   const onDragEnd = (result) => {
     const { destination, source, draggableId, type } = result;
 
@@ -24,8 +24,8 @@ const Board = ({ columns, columnOrder, data, onColumnDrop, onItemDrop, onAddColu
       return;
     }
 
-    if (type === 'column') {
-      return onColumnDrop(draggableId, source, destination);
+    if (type === 'lane') {
+      return onLaneDrop(draggableId, source, destination);
     }
 
     return onItemDrop(draggableId, source, destination);
@@ -36,18 +36,18 @@ const Board = ({ columns, columnOrder, data, onColumnDrop, onItemDrop, onAddColu
 
 
       <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId={'board'} direction={'horizontal'} type={'column'}>
+        <Droppable droppableId={'board'} direction={'horizontal'} type={'lane'}>
           {(provided) => (
             <div style={{ display: 'flex', overflow: 'scroll' }} {...provided.droppableProps} ref={provided.innerRef} >
-              {columnOrder.map((columnID, index) => {
-                const column = columns[columnID];
-                const tasks = column.cardIDs.map((taskID) => data.tasks[taskID]);
+              {laneOrder.map((laneID, index) => {
+                const lane = lanes[laneID];
+                const tasks = lane.cardIDs.map((taskID) => data.tasks[taskID]);
 
-                return <Column key={column.id} tasks={tasks} column={column} index={index}/>;
+                return <Lane key={lane.id} tasks={tasks} lane={lane} index={index}/>;
               })}
 
               <Wrapper>
-                <Button onClick={onAddColumn}>Add Column</Button>
+                <Button onClick={onAddLane}>Add Lane</Button>
               </Wrapper>
 
               {provided.placeholder}

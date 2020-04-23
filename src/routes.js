@@ -1,10 +1,10 @@
 import Login from 'pages/login';
 import Dashboard from 'pages/dashboard';
-import RetroShow from 'pages/retros/show';
+import BoardShow from 'pages/boards/show';
 
 export const privateRoutes = [
   { path: '/', page: Dashboard, private: true },
-  { path: '/r/:retroID', page: RetroShow, private: true }
+  { path: '/b/:boardID', page: BoardShow, private: true }
 ];
 
 export const publicRoutes = [
@@ -13,4 +13,4 @@ export const publicRoutes = [
 
 export const loginPath = () => '/login';
 export const dashboardPath = () => '/';
-export const retroPath = (id) => `/r/${id}`;
+export const boardPath = (id) => `/r/${id}`;

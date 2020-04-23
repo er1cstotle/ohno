@@ -1,10 +1,13 @@
-import { pink } from '@material-ui/core/colors';
+import { grey, orange } from '@material-ui/core/colors';
 
 export default {
+  palette: {
+    primary: orange
+  },
   overrides: {
     MuiToolbar: {
       root: {
-        backgroundColor: pink['A400']
+        backgroundColor: grey['900']
       }
     },
     MuiContainer: {

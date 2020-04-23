@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { styled } from '@material-ui/core/styles';
 
-import { retroPath } from 'routes';
+import { boardPath } from 'routes';
 
-import retroService from 'services/retros';
+import { createBoard, getBoardsForUser } from 'services/boards';
 
 import AddIcon from '@material-ui/icons/Add';
 import { Container, Fab, Grid, Slide, Hidden } from '@material-ui/core';
@@ -18,21 +18,22 @@ const AddBtn = styled(Fab)({
 
 const Dashboard = ({ user }) => {
   const history = useHistory();
-  const [retros, setRetros] = useState({});
+  const [boards, setBoards] = useState({});
 
   useEffect(() => {
     const getData = async () => {
-      const retros = await retroService.all(user.uid);
-      setRetros(retros);
+      const boards = await createBoard(user.uid);
+
+      setBoards(boards);
     };
 
     getData();
   }, []);
 
-  const createRetro = async () => {
+  const createBoard = async () => {
     try {
-      const retro = await retroService.create(user.uid);
-      history.push(retroPath(retro.id));
+      const board = await getBoardsForUser(user.uid);
+      history.push(boardPath(board.id));
     } catch (error) {
       console.log(error);
     }
@@ -44,9 +45,9 @@ const Dashboard = ({ user }) => {
 
       <Grid container>
         <Grid item xs={12} sm={9}>
-          {Object.values(retros).map((retro) => (
-            <Link key={retro.id} to={retroPath(retro.id)}>
-              {retro.id}
+          {Object.values(boards).map((board) => (
+            <Link key={board.id} to={boardPath(board.id)}>
+              {board.id}
             </Link>
           ))}
         </Grid>
@@ -58,7 +59,7 @@ const Dashboard = ({ user }) => {
       </Grid>
 
       <Slide direction="up" timeout={800} in mountOnEnter unmountOnExit>
-        <AddBtn color="primary" aria-label="add" onClick={createRetro}>
+        <AddBtn color="primary" aria-label="add" onClick={createBoard}>
           <AddIcon />
         </AddBtn>
       </Slide>

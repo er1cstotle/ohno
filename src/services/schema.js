@@ -1,37 +1,37 @@
 import firebase, { firestore } from '../services/firebase';
 
-export const retrosCollection = firestore.collection('retros');
+export const boardsCollection = firestore.collection('boards');
 export const usersCollection = firestore.collection('users');
-export const columnsCollection = firestore.collection('columns');
+export const lanesCollection = firestore.collection('lanes');
 export const cardsCollection = firestore.collection('cards');
 
-export const Retro = ({ userID = '' }) => {
+export const Board = ({ userID = '' }) => {
   return {
     title: 'Untitled',
     creatorID: userID,
     members: [userID],
-    columnOrder: [],
+    laneOrder: [],
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   };
 };
 
-export const Column = ({ title = '', retroID, userID }) => {
+export const Lane = ({ title = '', boardID, userID }) => {
   return {
     title,
-    retroID,
+    boardID,
     userID,
     cardIDs: [],
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   };
 };
 
-export const Card = ({ title = '', content = '', retroID, userID, columnID }) => {
+export const Card = ({ title = '', content = '', boardID, userID, laneID }) => {
   return {
     title,
     content,
-    retroID,
+    boardID,
     userID,
-    columnID,
+    laneID,
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   };
 };

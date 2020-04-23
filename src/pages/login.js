@@ -5,7 +5,7 @@ import { styled } from '@material-ui/core/styles';
 
 import { dashboardPath } from 'routes';
 
-import retroService from 'services/retros';
+import boardService from 'services/boards';
 
 import { Container, Fab, Grid, Slide, Button } from '@material-ui/core';
 import { Seo, Link } from 'components';

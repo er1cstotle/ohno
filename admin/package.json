@@ -5,7 +5,7 @@
   "main": "seeds.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "db:drop": "firebase firestore:delete --project retros-dev-20eb6 -r users && firebase firestore:delete --project retros-dev-20eb6 -r retros && firebase firestore:delete --project retros-dev-20eb6 -r columns && firebase firestore:delete --project retros-dev-20eb6 -r cards",
+    "db:drop": "firebase firestore:delete --project supra-turbo-dev -r users && firebase firestore:delete --project supra-turbo-dev -r boards && firebase firestore:delete --project supra-turbo-dev -r lanes && firebase firestore:delete --project supra-turbo-dev -r cards",
     "db:seed": "node seeds.js",
     "db:reset": "npm run db:drop && npm run db:seed"
   },

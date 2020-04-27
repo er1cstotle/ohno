@@ -3,7 +3,6 @@ import { privateRoutes } from 'routes';
 import { styled } from '@material-ui/core/styles';
 
 import {
-  BrowserRouter,
   Redirect,
   Route
 } from 'react-router-dom';
@@ -28,17 +27,14 @@ export default ({ user }) => {
             key={route.path}
             path={route.path}
             render={props => (
-              route.private && !user ?
-                <Redirect
-                  key={route.path}
-                  to={{
-                    pathname: '/login'
-                  }}
-                /> :
-                <route.page {...props} user={user} />
+              <route.page {...props} user={user} />
             )}
           />;
         })}
+
+        <Route path="/login">
+          <Redirect to={{ pathname: '/' }}/>
+        </Route>
 
         <Route path="*">
           gooooo fuck yourself

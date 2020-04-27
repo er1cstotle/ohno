@@ -10,7 +10,8 @@ import { Button,
   DialogActions,
   DialogContent,
   DialogContentText,
-  DialogTitle } from '@material-ui/core';
+  DialogTitle,
+  Typography } from '@material-ui/core';
 
 
 const components = {
@@ -22,14 +23,55 @@ const components = {
 
 };
 
-const Board = ({ data, onLaneAdd, handleLaneDragEnd, onCardAdd, handleDragEnd, onCardClick, onCardDelete }) => {
-  const [open, setOpen] = React.useState(false);
+const formatBoardData = (laneOrder, lanesMap, cardsMap) => {
+  const formattedLanes = laneOrder
+    .filter((laneID) => lanesMap[laneID])
+    .map((laneID) => {
+      const lane = lanesMap[laneID];
 
-  const handleClickOpen = () => {
+      lane.cards = lane.cardIDs
+        .filter((cardID) => cardsMap[cardID])
+        .map((cardID) => {
+          // react-trello only initializes laneId on load.
+          // https://github.com/rcdexta/react-trello/issues/325
+          return {
+            ...cardsMap[cardID],
+            laneId: lane.id
+          };
+        });
+
+      return lane;
+    });
+
+  return {
+    lanes: formattedLanes
+  };
+};
+
+
+const Board = ({ laneOrder, lanes, cards, onLaneAdd, handleLaneDragEnd, onCardAdd, handleDragEnd, onCardEdit, onCardDelete }) => {
+  const [open, setOpen] = React.useState(false);
+  const [selectedCardID, setSelectedCardID] = React.useState(false);
+
+  const handleClickOpen = (cardID) => {
     setOpen(true);
+    setSelectedCardID(cardID);
   };
 
+  const selectedCard = cards[selectedCardID];
+
+  console.log(selectedCard);
+
+
   const handleClose = () => {
+    setOpen(false);
+    setSelectedCardID(undefined);
+  };
+
+  const formattedData = formatBoardData(laneOrder, lanes, cards);
+
+  const handleCardEdit = () => {
+    onCardEdit(selectedCard);
     setOpen(false);
   };
 
@@ -42,42 +84,44 @@ const Board = ({ data, onLaneAdd, handleLaneDragEnd, onCardAdd, handleDragEnd, o
         editable
         canAddLanes
         components={components}
-        data={data}
+        data={formattedData}
         handleLaneDragEnd={handleLaneDragEnd}
         handleDragEnd={handleDragEnd}
         onLaneAdd={onLaneAdd}
         onCardAdd={onCardAdd}
-        onCardClick={() => {
-          handleClickOpen();
-          onCardClick();
-        }}
+        onCardClick={handleClickOpen}
         onCardDelete={onCardDelete}
       />
 
       <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
-        <DialogTitle id="form-dialog-title">Subscribe</DialogTitle>
+        <DialogTitle id="form-dialog-title">{selectedCard ? selectedCard.title : ''}</DialogTitle>
+
+
         <DialogContent>
           <DialogContentText>
-            To subscribe to this website, please enter your email address here. We will send updates
-            occasionally.
+            sdfnsdlfnsdlknflksdfnlksdnflksndflk
           </DialogContentText>
+          <Typography>
+            Details
+          </Typography>
           <TextField
-            autoFocus
-            margin="dense"
-            id="name"
-            label="Email Address"
-            type="email"
-            fullWidth
+            // label="Description"
+            multiline
+            rows={4}
+            defaultValue="Default Value"
+            variant="outlined"
           />
         </DialogContent>
+
         <DialogActions>
           <Button onClick={handleClose} color="primary">
             Cancel
           </Button>
-          <Button onClick={handleClose} color="primary">
-            Subscribe
+          <Button onClick={handleCardEdit} color="primary">
+            Save
           </Button>
         </DialogActions>
+
       </Dialog>
     </>
   );

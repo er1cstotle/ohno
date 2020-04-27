@@ -18,6 +18,7 @@ export const getBoardsForUser = async (userID) => {
       return {};
     }
 
+
     const result = boardsSnapshot.docs.reduce((accum, boardSnapshot) => {
       const data = boardSnapshot.data();
       const id = boardSnapshot.id;
@@ -25,35 +26,11 @@ export const getBoardsForUser = async (userID) => {
       return accum;
     }, {});
 
+
     return result;
   } catch (error) {
     console.log(error);
   }
-};
-
-const formatBoardData = (laneOrder, lanesMap, cardsMap) => {
-  const formattedLanes = laneOrder
-    .filter((laneID) => lanesMap[laneID])
-    .map((laneID) => {
-      const lane = lanesMap[laneID];
-
-      lane.cards = lane.cardIDs
-        .filter((cardID) => cardsMap[cardID])
-        .map((cardID) => {
-          // react-trello only initializes laneId on load.
-          // https://github.com/rcdexta/react-trello/issues/325
-          return {
-            ...cardsMap[cardID],
-            laneId: lane.id
-          };
-        });
-
-      return lane;
-    });
-
-  return {
-    lanes: formattedLanes
-  };
 };
 
 const actions = {
@@ -181,8 +158,6 @@ export const useBoardData = (boardID) => {
     }
   });
 
-  const formattedBoardData = state.board && state.board.laneOrder && formatBoardData(state.board.laneOrder, state.lanes, state.cards);
-
   const isLoading = () => {
     return loadingCards || loadingLanes;
   };
@@ -274,6 +249,6 @@ export const useBoardData = (boardID) => {
     });
   };
 
-  return [{ board: state.board, formattedBoardData }, isLoading(), { addLane, addCard, moveCard, updateLaneOrder }];
+  return [state, isLoading(), { addLane, addCard, moveCard, updateLaneOrder }];
 };
 

@@ -3,8 +3,8 @@ import Dashboard from 'pages/dashboard';
 import BoardShow from 'pages/boards/show';
 
 export const privateRoutes = [
-  { path: '/', page: Dashboard, private: true },
-  { path: '/b/:boardID', page: BoardShow, private: true }
+  { path: '/', page: Dashboard },
+  { path: '/b/:boardID', page: BoardShow }
 ];
 
 export const publicRoutes = [
@@ -13,4 +13,4 @@ export const publicRoutes = [
 
 export const loginPath = () => '/login';
 export const dashboardPath = () => '/';
-export const boardPath = (id) => `/r/${id}`;
+export const boardPath = (id) => `/b/${id}`;

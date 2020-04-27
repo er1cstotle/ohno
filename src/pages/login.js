@@ -1,42 +1,50 @@
 import React from 'react';
-import { auth } from 'services/firebase';
-import { useHistory } from 'react-router-dom';
+import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
+import firebase, { auth } from 'services/firebase';
 import { styled } from '@material-ui/core/styles';
 
-import { dashboardPath } from 'routes';
+import { Container, Paper, Grid, Zoom, Typography } from '@material-ui/core';
+import { Seo } from 'components';
 
-import boardService from 'services/boards';
+const uiConfig = {
+  signInFlow: 'popup',
+  callbacks: {
+    // Avoid redirects after sign-in.
+    signInSuccessWithAuthResult: () => false
+  },
+  signInOptions: [
+    firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+    'anonymous'
+  ]
+};
 
-import { Container, Fab, Grid, Slide, Button } from '@material-ui/core';
-import { Seo, Link } from 'components';
-
-const ContinueAsGuestBtn = styled(Button)({
-  padding: 16
+const LoginOptionsContainer = styled(Paper)({
+  paddingLeft: 25,
+  paddingRight: 25,
+  paddingTop: 15,
+  paddingBottom: 15
 });
 
-const Login = ({ user }) => {
-  const history = useHistory();
-
-  const continueAsGuest = async () => {
-    try {
-      await auth.signInAnonymously();
-      history.push(dashboardPath());
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
+const Login = () => {
   return (
     <Container maxWidth={'lg'}>
       <Seo title={'Login'}/>
 
-      <Grid container alignItems={'center'} justify={'center'}>
-        <Grid item >
-          <Slide direction="up" timeout={800} in mountOnEnter unmountOnExit>
-            <ContinueAsGuestBtn variant={'contained'} color={'primary'} aria-label="continue as guest" onClick={continueAsGuest}>
-          ContinueAsGuest
-            </ContinueAsGuestBtn>
-          </Slide>
+      <Grid container alignItems={'center'} justify={'center'} direction={'column'}>
+        <Grid item>
+          <Zoom direction="up" timeout={800} in mountOnEnter unmountOnExit>
+            <Typography variant={'h1'} gutterBottom>
+            Supra Turbo
+            </Typography>
+          </Zoom>
+        </Grid>
+
+        <Grid item>
+          <Zoom direction="up" timeout={800} in mountOnEnter unmountOnExit>
+            <LoginOptionsContainer variant={'outlined'}>
+              <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={auth}/>
+            </LoginOptionsContainer>
+          </Zoom>
         </Grid>
       </Grid>
 

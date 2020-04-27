@@ -15,6 +15,10 @@ const Main = styled('div')({
 });
 
 export default ({ user }) => {
+  console.log(user);
+  console.log('sdfsldkfnk');
+
+
   return (
     <Main>
       <SwitchWithTransition>
@@ -23,7 +27,7 @@ export default ({ user }) => {
             exact
             key={route.path}
             path={route.path}
-            render={props => <route.page {...props} user={user} />}
+            render={props => <route.page {...props}/>}
           />;
         })}
 

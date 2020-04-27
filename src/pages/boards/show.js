@@ -5,7 +5,7 @@ import { Seo, Link } from 'components';
 import Board from 'components/board';
 
 const BoardShow = ({ user, match: { params: { boardID } } }) => {
-  const [{ board, formattedBoardData }, loadingBoard, { addLane, addCard, moveCard, updateLaneOrder }] = useBoardData(boardID);
+  const [{ board, cards, lanes }, loadingBoard, { addLane, addCard, moveCard, updateLaneOrder }] = useBoardData(boardID);
 
   const onAddLane = async ({ title }) => {
     addLane({
@@ -47,15 +47,16 @@ const BoardShow = ({ user, match: { params: { boardID } } }) => {
       <Seo title={board.title}/>
 
       {!loadingBoard && <Board
-        data={formattedBoardData}
+        laneOrder={board.laneOrder}
+        lanes={lanes}
+        cards={cards}
+
         handleLaneDragEnd={onLaneDrop}
         handleDragEnd={onCardDrop}
         onLaneAdd={onAddLane}
         onCardAdd={onAddCard}
-        onCardClick={(card, lane) => {
-          console.log('clicked');
-          console.log(lane);
-          console.log(card);
+        onCardEdit={(newCard) => {
+          console.log(newCard);
         }}
         onCardDelete={(card, lane) => {
           console.log('delete');

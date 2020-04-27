@@ -5,7 +5,7 @@ import {
 
 export default (props) => {
   return (
-    <Link {...props} to={props.to}>
+    <Link style={{ textDecoration: 'none' }} {...props} to={props.to}>
       {props.children}
     </Link>
   );

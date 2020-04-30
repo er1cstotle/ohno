@@ -86,7 +86,7 @@ export default ({ user }) => {
           </IconButton> */}
 
           <Link to={dashboardPath()} className={classes.title}>
-            <Typography variant="h6" color={'inherit'}>Supra Turbo</Typography>
+            <img style={{ height: 24 }} src="https://fontmeme.com/permalink/200430/c93256b76002c6f10e0f5c05f11fca87.png" alt="OHNO" border="0"/>
           </Link>
 
           {user && <IconButton color={'primary'} aria-controls="customized-menu"

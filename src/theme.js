@@ -1,8 +1,8 @@
-import { grey, orange } from '@material-ui/core/colors';
+import { grey, amber } from '@material-ui/core/colors';
 
 export default {
   palette: {
-    primary: orange
+    primary: amber
   },
   overrides: {
     MuiToolbar: {

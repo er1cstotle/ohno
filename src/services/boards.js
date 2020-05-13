@@ -33,7 +33,7 @@ export const getBoardsForUser = async (userID) => {
   }
 };
 
-const actions = {
+const baordActions = {
   setBoard: (prev, board) => {
     return {
       ...prev,
@@ -125,7 +125,31 @@ const actions = {
         laneOrder: newOrder
       }
     };
+  },
+  updateCardTitle: (prev, cardID, title) => {
+    return {
+      ...prev,
+      cards: {
+        ...prev.cards,
+        [cardID]: {
+          ...prev.cards[cardID],
+          title
+        }
+      }
+    };
 
+  },
+  updateCardNotes: (prev, cardID, notes) => {
+    return {
+      ...prev,
+      cards: {
+        ...prev.cards,
+        [cardID]: {
+          ...prev.cards[cardID],
+          notes
+        }
+      }
+    };
   }
 };
 
@@ -133,12 +157,11 @@ export const useBoardData = (boardID) => {
   const [loadingLanes, setLoadingLanes] = useState(true);
   const [loadingCards, setLoadingCards] = useState(true);
 
-  const [state, boundActions] = useActions(actions, {
+  const [state, boundActions] = useActions(baordActions, {
     board:{},
     lanes: {},
     cards: {}
   });
-
 
   useDocumentDataListener(boardsCollection.doc(boardID), (doc) => {
     boundActions.setBoard(doc);
@@ -249,6 +272,28 @@ export const useBoardData = (boardID) => {
     });
   };
 
-  return [state, isLoading(), { addLane, addCard, moveCard, updateLaneOrder }];
+  const updateCardTitle = (cardID, title) => {
+    cardsCollection.doc(cardID).update({
+      title
+    });
+
+    boundActions.updateCardTitle(cardID, title);
+  };
+
+  const updateCardNotes = (cardID, notes) => {
+    cardsCollection.doc(cardID).update({
+      notes
+    });
+    boundActions.updateCardNotes(cardID, notes);
+  };
+
+  return [state, isLoading(), {
+    addLane,
+    addCard,
+    moveCard,
+    updateLaneOrder,
+    updateCardTitle,
+    updateCardNotes
+  }];
 };
 

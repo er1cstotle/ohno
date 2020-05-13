@@ -1,26 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Trello from 'react-trello';
+import { grey } from '@material-ui/core/colors';
 
 import BoardCard from './board-card';
 import AddCardLink from './new-lane-button';
+import NewCardForm from './new-card-form';
 
-import { Button,
+import {
+  Button,
   TextField,
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Typography } from '@material-ui/core';
-
+  DialogTitle
+} from '@material-ui/core';
 
 const components = {
   // GlobalStyle: MyGlobalStyle, // global style created with method `createGlobalStyle` of `styled-components`
   // LaneHeader: MyLaneHeader,
   Card: BoardCard,
-  NewLaneSection: AddCardLink
+  NewLaneSection: AddCardLink,
+  NewCardForm
   // BoardWrapper: BoardWrapper
-
 };
 
 const formatBoardData = (laneOrder, lanesMap, cardsMap) => {
@@ -48,31 +49,30 @@ const formatBoardData = (laneOrder, lanesMap, cardsMap) => {
   };
 };
 
-
-const Board = ({ laneOrder, lanes, cards, onLaneAdd, handleLaneDragEnd, onCardAdd, handleDragEnd, onCardEdit, onCardDelete }) => {
-  const [open, setOpen] = React.useState(false);
-  const [selectedCardID, setSelectedCardID] = React.useState(false);
+const Board = (props) => {
+  const [open, setOpen] = useState(true);
+  const [selectedCardID, setSelectedCardID] = useState(undefined);
 
   const handleClickOpen = (cardID) => {
     setOpen(true);
     setSelectedCardID(cardID);
   };
 
-  const selectedCard = cards[selectedCardID];
-
-  console.log(selectedCard);
-
+  const selectedCard = props.cards[selectedCardID];
 
   const handleClose = () => {
     setOpen(false);
     setSelectedCardID(undefined);
   };
 
-  const formattedData = formatBoardData(laneOrder, lanes, cards);
+  const formattedData = formatBoardData(props.laneOrder, props.lanes, props.cards);
 
-  const handleCardEdit = () => {
-    onCardEdit(selectedCard);
-    setOpen(false);
+  const onEditTitle = (title) => {
+    props.onEditCardTitle(selectedCardID, title);
+  };
+
+  const onEditNotes = (notes) => {
+    props.onEditCardNotes(selectedCardID, notes);
   };
 
   return (
@@ -85,47 +85,43 @@ const Board = ({ laneOrder, lanes, cards, onLaneAdd, handleLaneDragEnd, onCardAd
         canAddLanes
         components={components}
         data={formattedData}
-        handleLaneDragEnd={handleLaneDragEnd}
-        handleDragEnd={handleDragEnd}
-        onLaneAdd={onLaneAdd}
-        onCardAdd={onCardAdd}
+        handleLaneDragEnd={props.handleLaneDragEnd}
+        handleDragEnd={props.handleDragEnd}
+        onLaneAdd={props.onLaneAdd}
+        onCardAdd={props.onCardAdd}
         onCardClick={handleClickOpen}
-        onCardDelete={onCardDelete}
+        onCardDelete={props.onCardDelete}
       />
 
-      <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
-        <DialogTitle id="form-dialog-title">{selectedCard ? selectedCard.title : ''}</DialogTitle>
-
-
-        <DialogContent>
-          <DialogContentText>
-            sdfnsdlfnsdlknflksdfnlksdnflksndflk
-          </DialogContentText>
-          <Typography>
-            Details
-          </Typography>
+      {selectedCard && <Dialog open={open} onClose={handleClose} aria-labelledby="card-form" fullWidth>
+        <DialogTitle>
           <TextField
-            // label="Description"
+            fullWidth
+            InputProps={{ style: { fontSize: 20 } }}
+            onBlur={(e) => onEditTitle(e.target.value)}
+            defaultValue={selectedCard.title}
+          />
+        </DialogTitle>
+        <DialogContent>
+          <TextField
+            label={'Notes'}
+            fullWidth
             multiline
-            rows={4}
-            defaultValue="Default Value"
-            variant="outlined"
+            rows={5}
+            defaultValue={selectedCard.notes}
+            variant={'filled'}
+            onBlur={(e) => onEditNotes(e.target.value)}
           />
         </DialogContent>
 
-        <DialogActions>
+        <DialogActions style={{ backgroundColor: grey[900] }}>
           <Button onClick={handleClose} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleCardEdit} color="primary">
-            Save
+            Done
           </Button>
         </DialogActions>
-
-      </Dialog>
+      </Dialog>}
     </>
   );
 };
-
 
 export default Board;

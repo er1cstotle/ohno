@@ -1,11 +1,15 @@
 import React from 'react';
 import { useBoardData } from 'services/boards';
 
-import { Seo, Link } from 'components';
+import { Seo } from 'components';
 import Board from 'components/board';
 
 const BoardShow = ({ user, match: { params: { boardID } } }) => {
-  const [{ board, cards, lanes }, loadingBoard, { addLane, addCard, moveCard, updateLaneOrder }] = useBoardData(boardID);
+  const [
+    { board, cards, lanes },
+    loadingBoard,
+    { addLane, addCard, moveCard, updateLaneOrder, updateCardTitle, updateCardNotes }
+  ] = useBoardData(boardID);
 
   const onAddLane = async ({ title }) => {
     addLane({
@@ -38,33 +42,29 @@ const BoardShow = ({ user, match: { params: { boardID } } }) => {
     return false;
   };
 
-  // if (!board || !lanes) {
-  //   return <p>loading</p>;
-  // }
-
   return (
     <div>
       <Seo title={board.title}/>
 
-      {!loadingBoard && <Board
-        laneOrder={board.laneOrder}
-        lanes={lanes}
-        cards={cards}
+      {!loadingBoard &&
+        <Board
+          laneOrder={board.laneOrder}
+          lanes={lanes}
+          cards={cards}
+          handleLaneDragEnd={onLaneDrop}
+          handleDragEnd={onCardDrop}
+          onLaneAdd={onAddLane}
+          onCardAdd={onAddCard}
+          onCardDelete={(card, lane) => {
+            console.log('delete');
+            console.log(lane);
+            console.log(card);
+          }}
 
-        handleLaneDragEnd={onLaneDrop}
-        handleDragEnd={onCardDrop}
-        onLaneAdd={onAddLane}
-        onCardAdd={onAddCard}
-        onCardEdit={(newCard) => {
-          console.log(newCard);
-        }}
-        onCardDelete={(card, lane) => {
-          console.log('delete');
-          console.log(lane);
-          console.log(card);
-        }}
-      />}
-
+          onEditCardTitle={updateCardTitle}
+          onEditCardNotes={updateCardNotes}
+        />
+      }
     </div>
   );
 };

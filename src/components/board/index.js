@@ -78,7 +78,7 @@ const Board = (props) => {
   return (
     <>
       <Trello
-        style={{ backgroundColor: 'white' }}
+        style={{ backgroundColor: 'white', height: 'calc(100vh - 48px)' }}
         editLaneTitle
         draggable
         editable

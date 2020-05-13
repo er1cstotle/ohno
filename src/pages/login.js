@@ -27,43 +27,41 @@ const LoginOptionsContainer = styled(Paper)({
   textAlign: 'center'
 });
 
+const Background = styled('div')({
+  height: '100vh',
+  // https://dribbble.com/shots/5676101-assemby-line
+  background: 'linear-gradient(rgb(117, 117, 117, 0.75), rgb(117, 117, 117, 0.75)), url(assembly.png)',
+  backgroundSize: 'cover'
+});
+
 const Login = () => {
   return (
-    <div style={{
-      // backgroundColor: amber['A700'],
-      height: '100vh',
-      background: 'linear-gradient(rgb(117, 117, 117, 0.75), rgb(117, 117, 117, 0.75)), url(assembly.png)',
-      backgroundSize: 'cover'
-    }}>
+    <Background>
       <Seo title={'Login'}/>
 
       <Grid container alignItems={'center'} justify={'center'}>
         <Grid item xs={12} sm={3}>
           <Slide direction="up" timeout={500} in mountOnEnter unmountOnExit>
+            <LoginOptionsContainer elevation={5}>
 
-            <Slide direction="up" timeout={800} in mountOnEnter unmountOnExit>
-              <LoginOptionsContainer elevation={5}>
-
-                <Typography variant={'h6'} align={'center'}>
+              <Typography variant={'h6'} align={'center'}>
                   Welcome to
-                </Typography>
+              </Typography>
 
-                <img
-                  style={{
-                    width: '50%'
-                  }}
-                  src="https://fontmeme.com/permalink/200430/ac59e96c8c3b16bfb0feb12e33a25955.png" alt="OHNO" border="0"/>
+              <img
+                style={{
+                  width: '50%'
+                }}
+                src="https://fontmeme.com/permalink/200430/ac59e96c8c3b16bfb0feb12e33a25955.png"
+                alt="OHNO"
+                border="0"/>
 
-
-                <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={auth}/>
-
-              </LoginOptionsContainer>
-            </Slide>
+              <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={auth}/>
+            </LoginOptionsContainer>
           </Slide>
         </Grid>
       </Grid>
-
-    </div>
+    </Background>
   );
 };
 

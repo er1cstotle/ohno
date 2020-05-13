@@ -16,6 +16,7 @@ import {
   Grid,
   Hidden,
   Card,
+  Fade,
   Slide
 } from '@material-ui/core';
 
@@ -71,26 +72,28 @@ const Dashboard = ({ user }) => {
           </Grid>
         </Hidden> */}
 
-
         <Grid item xs={12} >
           <Typography variant={'h5'} gutterBottom>Boards</Typography>
           <Grid container direction={'row'} spacing={3}>
 
             {Object.values(boards).map((board) => (
-              <Grid key={board.id} item xs={3}>
-                <Link to={boardPath(board.id)}>
 
-                  <Card variant="outlined" elevation={0}>
-                    <CardContent>
-                      <Typography variant="h5" component="h2">{board.title}</Typography>
+              <Fade key={board.id} timeout={300} in mountOnEnter unmountOnExit>
+                <Grid item xs={3}>
+                  <Link to={boardPath(board.id)}>
 
-                      <Typography className={classes.pos} color="textSecondary">Created by: Eric Leong</Typography>
-                      <Typography className={classes.title} color="textSecondary">Dream Team</Typography>
+                    <Card variant="outlined" elevation={0}>
+                      <CardContent>
+                        <Typography variant="h5" component="h2">{board.title}</Typography>
 
-                    </CardContent>
-                  </Card>
-                </Link>
-              </Grid>
+                        <Typography className={classes.pos} color="textSecondary">Created by: Eric Leong</Typography>
+                        <Typography className={classes.title} color="textSecondary">Dream Team</Typography>
+
+                      </CardContent>
+                    </Card>
+                  </Link>
+                </Grid>
+              </Fade>
             ))}
 
           </Grid>

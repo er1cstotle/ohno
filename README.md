@@ -1,4 +1,4 @@
-# OHNO yet another kanban board
+# OHNO - yet another kanban board
 
 > Named after the creator of kanban [Taiichi Ohno](https://en.wikipedia.org/wiki/Taiichi_Ohno)
 

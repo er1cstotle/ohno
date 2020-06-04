@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import useActions from 'use-actions';
-import { useCollectionMapListener, useDocumentDataListener } from 'fire-hydrant';
+import { useCollectionMapListener, useDocumentDataListener, useCollectionDataOnce } from 'fire-hydrant';
 
 import firebase from './firebase';
 import { boardsCollection, Board, cardsCollection, Card, lanesCollection, Lane } from './schema';
@@ -10,6 +10,10 @@ export const createBoard = (userID) => {
   return boardsCollection.add(newBoard);
 };
 
+export const useBoardsForUser = (userID) => {
+  return useCollectionDataOnce(boardsCollection.where('members', 'array-contains', userID));
+};
+
 export const getBoardsForUser = async (userID) => {
   try {
     const boardsSnapshot = await boardsCollection.where('members', 'array-contains', userID).get();
@@ -17,7 +21,6 @@ export const getBoardsForUser = async (userID) => {
     if (boardsSnapshot.empty) {
       return {};
     }
-
 
     const result = boardsSnapshot.docs.reduce((accum, boardSnapshot) => {
       const data = boardSnapshot.data();

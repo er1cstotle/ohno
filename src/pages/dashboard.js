@@ -3,7 +3,7 @@ import { useHistory } from 'react-router-dom';
 import { styled, makeStyles } from '@material-ui/core/styles';
 
 import { boardPath } from 'routes';
-import { createBoard, getBoardsForUser } from 'services/boards';
+import { createBoard, useBoardsForUser } from 'services/boards';
 
 import AddIcon from '@material-ui/icons/Add';
 import {
@@ -36,18 +36,9 @@ const useStyles = makeStyles({
 
 const Dashboard = ({ user }) => {
   const history = useHistory();
-  const [boards, setBoards] = useState({});
-
   const classes = useStyles();
 
-  useEffect(() => {
-    const getData = async () => {
-      const boards = await getBoardsForUser(user.uid);
-      setBoards(boards);
-    };
-
-    getData();
-  }, []);
+  const [boards, loadingBoards, errorBoards, setBoards] = useBoardsForUser(user && user.uid);
 
   const handleCreateBoard = async () => {
     try {
@@ -76,7 +67,7 @@ const Dashboard = ({ user }) => {
           <Typography variant={'h5'} gutterBottom>Boards</Typography>
           <Grid container direction={'row'} spacing={3}>
 
-            {Object.values(boards).map((board) => (
+            {boards && Object.values(boards).map((board) => (
 
               <Fade key={board.id} timeout={300} in mountOnEnter unmountOnExit>
                 <Grid item xs={3}>

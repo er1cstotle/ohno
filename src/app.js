@@ -1,6 +1,6 @@
 import React from 'react';
 import { auth } from 'services/firebase';
-import { useAuthState } from 'react-firebase-hooks/auth';
+import { useAuthState } from 'fire-hydrant';
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 
 import theme from './theme';

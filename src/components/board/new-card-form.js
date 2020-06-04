@@ -52,9 +52,6 @@ const CloseButton = styled(CloseIcon)({
 const NewCardForm = ({ onCancel, onAdd }) => {
   const [title, setTitle] = useState('');
 
-  console.log(title);
-
-
   const handleAdd = () => {
     onAdd({
       title

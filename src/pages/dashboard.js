@@ -49,9 +49,6 @@ const Dashboard = ({ user }) => {
     }
   };
 
-  console.log(boards);
-
-
   return (
     <Container maxWidth={'md'}>
       <Seo title={'Dashboard'}/>

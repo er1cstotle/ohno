@@ -15,9 +15,6 @@ const Main = styled('div')({
 });
 
 export default ({ user }) => {
-  console.log(user);
-  console.log('sdfsldkfnk');
-
 
   return (
     <Main>
